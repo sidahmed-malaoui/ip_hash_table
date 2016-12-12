@@ -128,14 +128,6 @@ func main() {
 		}
 	}
 
-	insert(&ip_black_list, strings.Split("192.168.33.44", "."))
-	insert(&ip_black_list, strings.Split("192.168.33.44", "."))
-	insert(&ip_black_list, strings.Split("192.168.55.66", "."))
-	insert(&ip_black_list, strings.Split("19.168.55.66", "."))
-	insert(&ip_black_list, strings.Split("55.168.55.66", "."))
-	insert(&ip_black_list, strings.Split("88.168.55.66", "."))
-	insert(&ip_black_list, strings.Split("35.43.78.100", "."))
-
 	fmt.Println("Les adresses IP de notre black list")
 	print(ip_black_list, [4]int64{0}, 0)
 
