@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"regexp"
 )
 
 type Element struct {
@@ -87,6 +88,31 @@ func insert(head **Element, ip []string) {
 }
 
 
+/* Cette fonction cherche l'existance de L'@IP dans la blacklist. */
+func search(ip_black_list *Element, ip []string) bool {
+	var e *Element
+	/* Condition d'arrêt de notre fonction récursive. Si on a trouver tous les octets de notre adresse IP
+	   alors on s'arrête et on retourne true. */
+    if len(ip) == 0 {
+    	return true
+    }
+
+    for e = ip_black_list; e != nil; e = e.next_elt {
+    	ip_octet, _ := strconv.ParseInt(ip[0], 10, 64)
+    	if e.value == ip_octet {
+    		break
+    	}
+    }
+
+    /* Si on n'a pas trouvé l'actuel alors on retourne false. Sinon on continue de chercher les autres 
+       octets de l'@IP .*/
+    if e == nil {
+    	return false
+    } else {
+    	return search(e.next_byte, ip[1:])
+    }
+}
+
 func main() {
 	var ip_black_list *Element
 	var ip string
@@ -95,7 +121,11 @@ func main() {
 	fmt.Println("Insérez les @IP (une par ligne) et finissez l'insertion par une ligne vide :")
 	for n != 0 {
 		n, _ = fmt.Scanln(&ip)
-		insert(&ip_black_list, strings.Split(ip, "."))
+		if matches, _ := regexp.MatchString("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$", ip); !matches {
+			fmt.Println("Ceci n'est pas une @IP valide")
+		} else {
+			insert(&ip_black_list, strings.Split(ip, "."))
+		}
 	}
 
 	insert(&ip_black_list, strings.Split("192.168.33.44", "."))
@@ -108,4 +138,20 @@ func main() {
 
 	fmt.Println("Les adresses IP de notre black list")
 	print(ip_black_list, [4]int64{0}, 0)
+
+	fmt.Println("Entrez les @IP à chercher dans la blacklist (une par ligne) :")
+	n = 1
+	for n != 0 {
+		n, _ = fmt.Scanln(&ip)
+		if matches, _ := regexp.MatchString("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$", ip); !matches {
+			fmt.Println("Ceci n'est pas une @IP valide")
+			continue
+		}
+
+		if exists := search(ip_black_list, strings.Split(ip, ".")); exists {
+			fmt.Println("L'@IP est dans notre black list")
+		} else {
+			fmt.Println("L'@IP n'est pas dans notre black list")
+		}
+	}
 }
